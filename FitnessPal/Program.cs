@@ -1,4 +1,8 @@
+using FitnessPal.Areas.Identity.Db;
 using FitnessPal.Components;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 
 namespace FitnessPal
 {
@@ -11,6 +15,14 @@ namespace FitnessPal
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+            builder.Services.AddMudServices();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
 
             var app = builder.Build();
 
@@ -23,6 +35,10 @@ namespace FitnessPal
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapRazorPages();
 
             app.UseStaticFiles();
             app.UseAntiforgery();
